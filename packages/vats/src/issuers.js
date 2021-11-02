@@ -82,7 +82,7 @@ const fromCosmosIssuerEntries = centralRecord => [
     'BLD',
     {
       issuerArgs: [undefined, { decimalPlaces: 6 }],
-      defaultPurses: [['Agoric staking token', scaleMicro(62)]],
+      defaultPurses: [['Agoric staking token', scaleMicro(5000)]],
       bankDenom: 'ubld',
       bankPurse: 'Agoric staking token',
       collateralConfig: {
@@ -94,9 +94,9 @@ const fromCosmosIssuerEntries = centralRecord => [
         loanFeeBasis: 1n,
       },
       tradesGivenCentral: [
-        [scaleCentral(27.9, 1), scaleMicro(1)],
-        [scaleCentral(25.7, 1), scaleMicro(1)],
-        [scaleCentral(26.8, 1), scaleMicro(1)],
+        [scaleCentral(1.23, 2), scaleMicro(1)],
+        [scaleCentral(1.21, 2), scaleMicro(1)],
+        [scaleCentral(1.22, 2), scaleMicro(1)],
       ],
     },
   ],
