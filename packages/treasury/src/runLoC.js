@@ -2,7 +2,10 @@
 import { Far } from '@agoric/marshal';
 import { assertProposalShape } from '@agoric/zoe/src/contractSupport';
 
-/** @type {ContractStartFn} */
+/**
+ * @param { ContractFacet } zcf
+ * @param {{ feeMintAccess: FeeMintAccess }} privateArgs
+ */
 const start = async (zcf, privateArgs) => {
   const { governedParams } = zcf.getTerms();
   const { feeMintAccess } = privateArgs;
