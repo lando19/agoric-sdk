@@ -80,6 +80,7 @@ const start = async (zcf, { feeMintAccess }) => {
     Far('Line of Credit API', {
       getInvitation: () =>
         zcf.makeInvitation(handleOffer, 'RUN Line of Credit'),
+      // TODO: repayment, with attendant bookkeeping
     }),
   );
 
