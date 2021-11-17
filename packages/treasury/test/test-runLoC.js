@@ -361,6 +361,9 @@ const testLoC = (
 
     t.true(await E(seat).hasExited());
 
+    // attPmt is spent
+    t.throwsAsync(E(attIssuer).getAmountOf(attPmt));
+
     const p = await allValues(await E(seat).getPayouts());
     t.log('payout', p);
     t.deepEqual(await E(runIssuer).getAmountOf(p.RUN), run(runWanted));
