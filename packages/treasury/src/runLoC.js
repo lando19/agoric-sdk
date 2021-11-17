@@ -6,7 +6,7 @@ import {
   assertProposalShape,
   ceilMultiplyBy,
   floorMultiplyBy,
-} from '@agoric/zoe/src/contractSupport';
+} from '@agoric/zoe/src/contractSupport/index.js';
 
 const { details: X, quote: q } = assert;
 
