@@ -2,13 +2,15 @@
 
 import {
   assertChecker,
-  compareRank,
   getTag,
-  isRankSorted,
-  sortByRank,
   makeTagged,
   passStyleOf,
 } from '@agoric/marshal';
+import {
+  compareRank,
+  isRankSorted,
+  sortByRank,
+} from '../patterns/rankOrder.js';
 
 // eslint-disable-next-line spaced-comment
 /// <reference types="ses"/>

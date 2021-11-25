@@ -3,7 +3,8 @@
 // eslint-disable-next-line spaced-comment
 /// <reference types="ses"/>
 
-import { compareRank, passStyleOf, getTag } from '@agoric/marshal';
+import { passStyleOf, getTag } from '@agoric/marshal';
+import { compareRank } from '../patterns/rankOrder.js';
 import { assertKey } from './checkKey.js';
 
 const { details: X, quote: q } = assert;

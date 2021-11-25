@@ -3,8 +3,8 @@
 export { isKey, assertKey } from './keys/checkKey.js';
 export { keyLT, keyLTE, keyEQ, keyGTE, keyGT } from './keys/compareKeys.js';
 
-export { isPattern, assertPattern } from './patterns/patternMatchers.js';
-export { M } from './patterns/M.js';
+export { makePatternKit } from './patterns/patternMatchers.js';
+export { compareRank } from './patterns/rankOrder.js';
 
 export { makeScalarWeakSetStore } from './stores/scalarWeakSetStore.js';
 export { makeScalarSetStore } from './stores/scalarSetStore.js';

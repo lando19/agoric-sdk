@@ -104,6 +104,97 @@
  * ) => Iterable<[K,V]>} cursor
  */
 
+// //// Rank types
+
+/**
+ * @callback CompareRank
+ * Returns `-1`, `0`, or `1` depending on whether the rank of `left`
+ * is before, tied-with, or after the rank of `right`.
+ *
+ * This comparison function is valid as argument to
+ * `Array.prototype.sort`. This is often described as a "total order"
+ * but, depending on your definitions, this is technically incorrect
+ * because it may return `0` to indicate that two distinguishable elements,
+ * like `-0` and `0`, are tied, i.e., are in the same equivalence class
+ * as far as this ordering is concerned. If each such equivalence class is
+ * a *rank* and ranks are disjoint, then this "rank order" is a
+ * total order among these ranks. In mathematics this goes by several
+ * other names such as "total preorder".
+ *
+ * This function establishes a total rank order over all passables.
+ * To do so it makes arbitrary choices, such as that all strings
+ * are after all numbers. Thus, this order is not intended to be
+ * used directly as a comparison with useful semantics. However, it must be
+ * closely enough related to such comparisons to aid in implementing
+ * lookups based on those comparisons. For example, in order to get a total
+ * order among ranks, we put `NaN` after all other JavaScript "number" values.
+ * But otherwise, we order JavaScript numbers by magnitude,
+ * with `-0` tied with `0`. A semantically useful ordering of JavaScript number
+ * values, i.e., IEEE floating point values, would compare magnitudes, and
+ * so agree with the rank ordering everywhere except `NaN`. An array sorted by
+ * rank would enable range queries by magnitude.
+ * @param {Passable} left
+ * @param {Passable} right
+ * @returns {-1 | 0 | 1}
+ */
+
+/**
+ * @typedef {Object} ReadOnlyRankStore
+ * @property {() => Passable[]} snapshot
+ * @property {() => ReadOnlyRankStore} readOnlyView
+ * @property {(rankCover?: RankCover) => Iterable<[number, Passable]>} entries
+ * @property {(rankCover?: RankCover) => Iterable<number>} keys
+ * @property {(rankCover?: RankCover) => Iterable<Passable>} values
+ */
+
+/**
+ * @typedef {Object} RankStore
+ * @property {(passable: Passable) => void} add
+ * TODO need some kind of deletion
+ *
+ * TODO I should be able to share supertype rather than repeat
+ * @property {() => Passable[]} snapshot
+ * @property {() => ReadOnlyRankStore} readOnlyView
+ * @property {(rankCover?: RankCover) => Iterable<[number, Passable]>} entries
+ * @property {(rankCover?: RankCover) => Iterable<number>} keys
+ * @property {(rankCover?: RankCover) => Iterable<Passable>} values
+ */
+
+/**
+ * @typedef {[string, string]} RankCover
+ */
+
+/**
+ * @typedef {[number, number]} IndexCover
+ */
+
+/**
+ * @callback GetPassStyleCover
+ * Associate with each passStyle a RankCover that may be an overestimate,
+ * and whose results therefore need to be filtered down. For example, because
+ * there is not a smallest or biggest bigint, bound it by `NaN` (the last place
+ * number) and `''` (the empty string, which is the first place string). Thus,
+ * a range query using this range may include these values, which would then
+ * need to be filtered out.
+ * @param {PassStyle} passStyle
+ * @returns {RankCover}
+ */
+
+/**
+ * @callback GetIndexCover
+ * @param {Passable[]} sorted
+ * @param {CompareRank} compare
+ * @param {RankCover} rankCover
+ * @returns {IndexCover}
+ */
+
+/**
+ * @callback CoveredEntries
+ * @param {Passable[]} sorted
+ * @param {IndexCover} indexCover
+ * @returns {Iterable<[number, Passable]>}
+ */
+
 // ///////////////////////// Deprecated Legacy /////////////////////////////////
 
 /**
@@ -196,9 +287,28 @@
  */
 
 /**
+ * @callback CheckKeyPattern
+ * @param {Passable} allegedPattern
+ * @param {Checker=} check
+ * @returns {boolean}
+ */
+
+/**
+ * @callback KeyToDBKey
+ * @param {Passable} key
+ * @returns {string}
+ */
+
+/**
  * @callback GetRankCover
  * @param {Pattern} pattern
+ * @param {KeyToDBKey} encodeKey
  * @returns {RankCover}
+ */
+
+/**
+ * @typedef {Object} PatternMatcher
+ * @property {GetRankCover} getRankCover
  */
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -215,22 +325,31 @@
  * This factors out only the parts specific to each kind of Matcher. It is
  * encapsulated, and its methods can make the stated unchecker assumptions
  * enforced by the common calling logic.
+ *
  * @property {(allegedPayload: Passable,
  *             check?: Checker
  * ) => boolean} checkIsMatcherPayload
  * Assumes this is the payload of a CopyTagged with the corresponding
  * matchTag. Is this a valid payload for a Matcher with that tag?
+ *
  * @property {(specimen: Passable,
  *             matcherPayload: Passable,
  *             check?: Checker
  * ) => boolean} checkMatches
  * Assuming a valid Matcher of this type with `matcherPayload` as its
  * payload, does this specimen match that Matcher?
- * @property {(payload: Passable) => RankCover} getRankCover
+ *
+ * @property {(payload: Passable, encodeKey: KeyToDBKey) => RankCover} getRankCover
  * Assumes this is the payload of a CopyTagged with the corresponding
  * matchTag. Return a RankCover to bound from below and above,
  * in rank order, all possible Passables that would match this Matcher.
  * The left element must be before or the same rank as any possible
  * matching specimen. The right element must be after or the same
  * rank as any possible matching specimen.
+ *
+ * @property {(allegedPattern: Passable,
+ *             check?: Checker
+ * ) => boolean} checkKeyPattern
+ * Assumes this is the payload of a CopyTagged with the corresponding
+ * matchTag. Is this a valid pattern for use as a query key or key schema?
  */

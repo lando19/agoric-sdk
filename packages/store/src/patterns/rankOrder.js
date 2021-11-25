@@ -1,53 +1,38 @@
 // @ts-check
 
 import { assert, details as X, q } from '@agoric/assert';
-import { getTag } from './helpers/passStyle-helpers.js';
-import { nameForPassableSymbol } from './helpers/symbol.js';
-import { Far } from './make-far.js';
-import { makeTagged } from './makeTagged.js';
-import { passStyleOf } from './passStyleOf.js';
-import { sameValueZero } from './pureCopy.js';
+import {
+  getTag,
+  nameForPassableSymbol,
+  passStyleOf,
+  sameValueZero,
+} from '@agoric/marshal';
 
 const { fromEntries, entries, setPrototypeOf } = Object;
 
 const { ownKeys } = Reflect;
 
-const firstSymbol = Symbol.for('');
-const firstTagged = makeTagged('', null);
-const aFar = Far('after taggeds', {});
-const anError = new Error('error sigil');
-const aPromise = Promise.resolve('promise sigil');
-
 /**
- * Aside from 'undefined', lists the PassStyles from `types.js` in the same
- * order as they are declared there.
- * The `PassStyle` declaration in `./types.js` should be kept
- * in sync with the `PassStyleRankAndCover` data structure used to implement it.
- *
- * JavaScript `Array.prototype.sort` sorts all `undefined`s to the end of the
- * array without consulting the compare function. To avoid fighting with it,
- * we put `undefined` at the end, where it can serve as the end-sigil of the
- * ordering. In the same sense, `null` is the start-sigil of the ordering. This
- * is useful for range searches.
- *
  * @type {[PassStyle, RankCover][]}
  */
 const PassStyleRankAndCover = harden([
-  ['null', [null, null]], // only
-  ['boolean', [false, true]], // exact
-  ['number', [-Infinity, NaN]], // exact
-  ['bigint', [NaN, '']], // over below, over above
-  ['string', ['', firstSymbol]], // over above
-  ['symbol', [firstSymbol, {}]], // over above
-
-  ['copyRecord', [{}, []]], // over above
-  ['copyArray', [[], firstTagged]], // over above
-  ['tagged', [firstTagged, aFar]], // over above
-  ['remotable', [aFar, aFar]], // all tied
-
-  ['error', [anError, anError]], // all tied
-  ['promise', [aPromise, aPromise]], // all tied
-  ['undefined', [undefined, undefined]], // only
+  /* !  */ ['error', ['!', '!~']],
+  /* (  */ ['copyRecord', ['(', '(~']],
+  /* :  */ ['tagged', [':', ':~']],
+  /* ?  */ ['promise', ['?', '?~']],
+  /* [  */ ['copyArray', ['[', '[~']],
+  /* b  */ ['boolean', ['b', 'b~']],
+  /* f  */ ['number', ['f', 'f~']],
+  /* np */ ['bigint', ['n', 'p~']],
+  /* r  */ ['remotable', ['r', 'r~']],
+  /* s  */ ['string', ['s', 't']],
+  /* u  */ ['undefined', ['u', 'v']],
+  /* y  */ ['symbol', ['y', 'z']],
+  /* z  */ ['null', ['z', 'z~']],
+  /* | remotable->ordinal mapping prefix: This is not used in covers but it is
+       reserved from the same set of strings. Note that the prefix is > any
+       prefix used by any cover so that ordinal mapping keys are always outside
+       the range of valid collection entry keys. */
 ]);
 
 const PassStyleRank = fromEntries(
@@ -285,7 +270,7 @@ export const getIndexCover = (sorted, compare, [leftKey, rightKey]) => {
 harden(getIndexCover);
 
 /** @type {RankCover} */
-export const FullRankCover = harden([null, undefined]);
+export const FullRankCover = harden(['', '{']);
 
 /** @type {CoveredEntries} */
 export const coveredEntries = (sorted, [leftIndex, rightIndex]) => {
@@ -316,7 +301,7 @@ harden(coveredEntries);
  * @param {Passable} b
  * @returns {Passable}
  */
-const maxRank = (compare, a, b) => (compare(a, b) <= 0 ? a : b);
+const maxRank = (compare, a, b) => (compare(a, b) >= 0 ? a : b);
 
 /**
  * @param {CompareRank} compare
@@ -324,7 +309,7 @@ const maxRank = (compare, a, b) => (compare(a, b) <= 0 ? a : b);
  * @param {Passable} b
  * @returns {Passable}
  */
-const minRank = (compare, a, b) => (compare(a, b) >= 0 ? a : b);
+const minRank = (compare, a, b) => (compare(a, b) <= 0 ? a : b);
 
 /**
  * @param {CompareRank} compare
@@ -341,7 +326,7 @@ export const unionRankCovers = (compare, covers) => {
     minRank(compare, leftA, leftB),
     maxRank(compare, rightA, rightB),
   ];
-  return covers.reduce(unionRankCoverPair, [undefined, null]);
+  return covers.reduce(unionRankCoverPair, ['{', '']);
 };
 harden(unionRankCovers);
 
@@ -360,5 +345,5 @@ export const intersectRankCovers = (compare, covers) => {
     maxRank(compare, leftA, leftB),
     minRank(compare, rightA, rightB),
   ];
-  return covers.reduce(intersectRankCoverPair, [null, undefined]);
+  return covers.reduce(intersectRankCoverPair, ['', '{']);
 };

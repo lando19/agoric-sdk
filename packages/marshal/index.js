@@ -13,13 +13,18 @@ export {
 } from './src/helpers/remotable.js';
 
 export {
+  nameForPassableSymbol,
+  passableSymbolForName,
+} from './src/helpers/symbol.js';
+
+export {
   passStyleOf,
   assertPassable,
   everyPassableChild,
   somePassableChild,
 } from './src/passStyleOf.js';
 
-export { pureCopy } from './src/pureCopy.js';
+export { pureCopy, sameValueZero } from './src/pureCopy.js';
 export { deeplyFulfilled } from './src/deeplyFulfilled.js';
 
 export { makeTagged } from './src/makeTagged.js';
@@ -38,17 +43,3 @@ export {
   isRecord,
   isCopyArray,
 } from './src/assertPassStyleOf.js';
-export {
-  compareRank,
-  compareAntiRank,
-  isRankSorted,
-  assertRankSorted,
-  sortByRank,
-  FullRankCover,
-  getPassStyleCover,
-  getIndexCover,
-  coveredEntries,
-  unionRankCovers,
-  intersectRankCovers,
-} from './src/rankOrder.js';
-export { makeRankStore, makeRankStoreFactoryKit } from './src/rankStore.js';

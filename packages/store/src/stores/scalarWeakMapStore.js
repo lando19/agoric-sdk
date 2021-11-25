@@ -1,9 +1,10 @@
 // @ts-check
 
 import { Far, assertPassable, passStyleOf } from '@agoric/marshal';
-import { assertMatches, assertPattern } from '../patterns/patternMatchers.js';
+import { makePatternKit } from '../patterns/patternMatchers.js';
 
 const { details: X, quote: q } = assert;
+const { assertMatches, assertPattern } = makePatternKit();
 
 /**
  * @template K,V

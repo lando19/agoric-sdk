@@ -2,12 +2,11 @@
 
 import {
   assertChecker,
-  compareRank,
   getTag,
-  sortByRank,
   makeTagged,
   passStyleOf,
 } from '@agoric/marshal';
+import { compareRank, sortByRank } from '../patterns/rankOrder.js';
 import { checkCopySetKeys } from './copySet.js';
 
 // eslint-disable-next-line spaced-comment

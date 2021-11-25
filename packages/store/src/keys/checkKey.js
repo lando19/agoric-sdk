@@ -54,7 +54,7 @@ harden(assertPrimitiveKey);
  * @param {Checker=} check
  * @returns {boolean}
  */
-const checkScalarKey = (val, check = x => x) => {
+export const checkScalarKey = (val, check = x => x) => {
   if (isPrimitiveKey(val)) {
     return true;
   }

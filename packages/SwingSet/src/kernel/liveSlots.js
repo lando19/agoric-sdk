@@ -12,7 +12,7 @@ import { insistVatType, makeVatSlot, parseVatSlot } from '../parseVatSlots.js';
 import { insistCapData } from '../capdata.js';
 import { insistMessage } from '../message.js';
 import { makeVirtualObjectManager } from './virtualObjectManager.js';
-import { insistValidVatstoreKey } from './vatTranslator.js';
+import { makeCollectionManager } from './collectionManager.js';
 
 const DEFAULT_VIRTUAL_OBJECT_CACHE_SIZE = 3; // XXX ridiculously small value to force churn for testing
 
@@ -486,6 +486,8 @@ function build(
       console.info('Logging sent error stack', err),
   });
   const unmeteredUnserialize = meterControl.unmetered(m.unserialize);
+  // eslint-disable-next-line no-use-before-define
+  const unmeteredConvertSlotToVal = meterControl.unmetered(convertSlotToVal);
 
   function getSlotForVal(val) {
     return valToSlot.get(val);
@@ -511,6 +513,15 @@ function build(
   function addToPossiblyRetiredSet(vref) {
     possiblyRetiredSet.add(vref);
   }
+
+  const collectionManager = makeCollectionManager(
+    syscall,
+    // eslint-disable-next-line no-use-before-define
+    convertValToSlot,
+    unmeteredConvertSlotToVal,
+    m.serialize,
+    unmeteredUnserialize,
+  );
 
   const vom = makeVirtualObjectManager(
     syscall,
@@ -1049,6 +1060,11 @@ function build(
   const vatGlobals = harden({
     makeVirtualScalarWeakMap: vom.makeVirtualScalarWeakMap,
     makeKind: vom.makeKind,
+    makeScalarMapStore: collectionManager.makeScalarMapStore,
+    makeScalarWeakMapStore: collectionManager.makeScalarWeakMapStore,
+    makeScalarSetStore: collectionManager.makeScalarSetStore,
+    makeScalarWeakSetStore: collectionManager.makeScalarWeakSetStore,
+    M: collectionManager.M,
   });
 
   const inescapableGlobalProperties = harden({
@@ -1057,6 +1073,11 @@ function build(
   });
 
   const testHooks = harden({ ...vom.testHooks });
+
+  function assertValidUserVatstoreKey(key) {
+    assert.typeof(key, 'string');
+    assert(key.match(/^[-\w.+/]+$/), X`invalid vatstore key`);
+  }
 
   function setBuildRootObject(buildRootObject) {
     assert(!didRoot);
@@ -1081,26 +1102,26 @@ function build(
     if (enableVatstore) {
       vpow.vatstore = harden({
         get: key => {
-          insistValidVatstoreKey(key);
+          assertValidUserVatstoreKey(key);
           return syscall.vatstoreGet(`vvs.${key}`);
         },
         set: (key, value) => {
-          insistValidVatstoreKey(key);
+          assertValidUserVatstoreKey(key);
           assert.typeof(value, 'string');
           syscall.vatstoreSet(`vvs.${key}`, value);
         },
         getAfter: (priorKey, lowerBound, upperBound) => {
           let scopedPriorKey = '';
           if (priorKey !== '') {
-            insistValidVatstoreKey(priorKey);
+            assertValidUserVatstoreKey(priorKey);
             assert(priorKey >= lowerBound, 'priorKey must be >= lowerBound');
             scopedPriorKey = `vvs.${priorKey}`;
           }
-          insistValidVatstoreKey(lowerBound);
+          assertValidUserVatstoreKey(lowerBound);
           const scopedLowerBound = `vvs.${lowerBound}`;
           let scopedUpperBound;
           if (upperBound) {
-            insistValidVatstoreKey(upperBound);
+            assertValidUserVatstoreKey(upperBound);
             assert(upperBound > lowerBound, 'upperBound must be > lowerBound');
             scopedUpperBound = `vvs.${upperBound}`;
           }
@@ -1118,7 +1139,7 @@ function build(
           }
         },
         delete: key => {
-          insistValidVatstoreKey(key);
+          assertValidUserVatstoreKey(key);
           syscall.vatstoreDelete(`vvs.${key}`);
         },
       });
