@@ -24,7 +24,7 @@ import { makePromiseKit } from '@agoric/promise-kit';
 
 import { makeScriptedPriceAuthority } from '@agoric/zoe/tools/scriptedPriceAuthority.js';
 import { assertAmountsEqual } from '@agoric/zoe/test/zoeTestHelpers.js';
-import { makeInitialValues } from '@agoric/zoe/src/contracts/vpool-xyk-amm/params.js';
+import { makeParamManager } from '@agoric/zoe/src/contracts/vpool-xyk-amm/params.js';
 
 import { makeTracer } from '../src/makeTracer.js';
 import { SECONDS_PER_YEAR } from '../src/interest.js';
@@ -164,7 +164,7 @@ async function setupAmm(
     timer,
     poolFeeBP: POOL_FEE_BP,
     protocolFeeBP: PROTOCOL_FEE_BP,
-    main: makeInitialValues(POOL_FEE_BP, PROTOCOL_FEE_BP),
+    main: makeParamManager(POOL_FEE_BP, PROTOCOL_FEE_BP).getParamList(),
   };
 
   const ammGovernorTerms = {

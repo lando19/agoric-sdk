@@ -17,9 +17,9 @@ import path from 'path';
 import {
   setupGovernance,
   makeParamChangePositions,
-} from '../../src/governParam.js';
+} from '../../src/paramGovernance/governParam.js';
 import { MALLEABLE_NUMBER } from '../swingsetTests/contractGovernor/governedContract.js';
-import { makeGovernedNat } from '../../src/paramMakers.js';
+import { makeGovernedNat } from '../../src/paramGovernance/paramMakers.js';
 
 const filename = new URL(import.meta.url).pathname;
 const dirname = path.dirname(filename);
@@ -174,7 +174,7 @@ test('governParam bad update', async t => {
     { main: [makeGovernedNat(MALLEABLE_NUMBER, 602214090000000000000000n)] },
   );
   const brokenParamMgr = Far('broken ParamMgr', {
-    getParam: () => {
+    getNat: () => {
       return harden({ type: 'nat' });
     },
   });
@@ -218,7 +218,7 @@ test('governParam bad update', async t => {
   await t.throwsAsync(
     outcomeOfUpdate,
     {
-      message: 'target has no method "updateMalleableNumber", has ["getParam"]',
+      message: 'target has no method "updateMalleableNumber", has ["getNat"]',
     },
     'Expected a throw',
   );

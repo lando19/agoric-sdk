@@ -11,7 +11,7 @@ import noActionElectorateBundle from './bundle-noActionElectorate.js';
 import binaryVoteCounterBundle from './bundle-binaryVoteCounter.js';
 import { governedParameterTerms } from '../src/params';
 import { Far } from '@agoric/marshal';
-import { makeInitialValues } from '@agoric/zoe/src/contracts/vpool-xyk-amm/params';
+import { makeParamManager } from '@agoric/zoe/src/contracts/vpool-xyk-amm/params';
 
 const SECONDS_PER_HOUR = 60n * 60n;
 const SECONDS_PER_DAY = 24n * SECONDS_PER_HOUR;
@@ -33,7 +33,7 @@ async function setupAmm(
     timer,
     poolFeeBP: poolFee,
     protocolFeeBP: protocolFee,
-    main: makeInitialValues(poolFee, protocolFee),
+    main: makeParamManager(poolFee, protocolFee).getParamList(),
   };
 
   const ammGovernorTerms = {

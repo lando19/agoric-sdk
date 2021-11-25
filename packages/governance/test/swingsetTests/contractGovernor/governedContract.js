@@ -1,15 +1,25 @@
 // @ts-check
 
 import { handleParamGovernance } from '../../../src/contractHelper.js';
+import {
+  ParamType,
+  makeParamManagerBuilder,
+} from '../../../src/paramGovernance/paramManager.js';
 
 const MALLEABLE_NUMBER = 'MalleableNumber';
 
 /** @type {ContractStartFn} */
 const start = async zcf => {
-  const { main: initialValue } = zcf.getTerms();
+  const {
+    main: [{ name, type, value }],
+  } = zcf.getTerms();
+  assert(type === ParamType.NAT, `${name} Should be a Nat: ${type}`);
+
   const { makePublicFacet, makeCreatorFacet } = handleParamGovernance(
     zcf,
-    harden(initialValue),
+    makeParamManagerBuilder()
+      .addNat(name, value)
+      .build(),
   );
 
   return {

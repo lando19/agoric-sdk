@@ -3,8 +3,6 @@
 import { Far } from '@agoric/marshal';
 import { sameStructure } from '@agoric/same-structure';
 
-import { buildParamManager } from './paramManager.js';
-
 const { details: X, quote: q } = assert;
 
 /**
@@ -16,19 +14,30 @@ const { details: X, quote: q } = assert;
  *
  *  @type {HandleParamGovernance}
  */
-const handleParamGovernance = (zcf, governedParamsTemplate) => {
+const handleParamGovernance = (zcf, paramManager) => {
   const terms = zcf.getTerms();
   /** @type {ParamDescriptions} */
   const governedParams = terms.main;
   const { electionManager } = terms;
 
   assert(
-    sameStructure(governedParams, governedParamsTemplate),
-    X`Terms must include ${q(governedParamsTemplate)}, but were ${q(
+    sameStructure(governedParams, paramManager.getParamList()),
+    X`Terms must include ${q(paramManager.getParamList())}, but were ${q(
       governedParams,
     )}`,
   );
-  const paramManager = buildParamManager(governedParams);
+
+  const typedAccessors = {
+    getAmount: name => paramManager.getAmount(name),
+    getBrand: name => paramManager.getBrand(name),
+    getInstance: name => paramManager.getInstance(name),
+    getInstallation: name => paramManager.getInstallation(name),
+    getInvitationAmount: name => paramManager.getInvitationAmount(name),
+    getNat: name => paramManager.getNat(name),
+    getRatio: name => paramManager.getRatio(name),
+    getString: name => paramManager.getString(name),
+    getUnknown: name => paramManager.getUnknown(name),
+  };
 
   const makePublicFacet = (originalPublicFacet = {}) => {
     return Far('publicFacet', {
@@ -38,7 +47,7 @@ const handleParamGovernance = (zcf, governedParamsTemplate) => {
       getGovernedParams: () => {
         return paramManager.getParams();
       },
-      getParamValue: name => paramManager.getParam(name).value,
+      ...typedAccessors,
     });
   };
 
@@ -60,7 +69,7 @@ const handleParamGovernance = (zcf, governedParamsTemplate) => {
   return harden({
     makePublicFacet,
     makeCreatorFacet,
-    getParamValue: name => paramManager.getParam(name).value,
+    ...typedAccessors,
   });
 };
 harden(handleParamGovernance);

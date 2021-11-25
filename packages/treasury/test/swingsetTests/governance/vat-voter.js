@@ -6,7 +6,7 @@ import { q } from '@agoric/assert';
 import { sameStructure } from '@agoric/same-structure';
 import { validateQuestionFromCounter } from '@agoric/governance/src/contractGovernor';
 import { assertContractElectorate } from '@agoric/governance/src/validators';
-import { assertBallotConcernsQuestion } from '@agoric/governance/src/governParam';
+import { assertBallotConcernsQuestion } from '@agoric/governance/src/paramGovernance/governParam';
 
 const { details: X } = assert;
 
