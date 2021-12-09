@@ -17,7 +17,7 @@ export function makeSanityTests(stackFiltering) {
   const prefix = stackFiltering === 'concise' ? '' : '/bundled-source/.../';
 
   function stackContains(stack, filePattern) {
-    return stack.indexOf(`(${prefix}${filePattern}`) >= 0;
+    return stack.indexOf(`${prefix}${filePattern}`) >= 0;
   }
 
   test(`endoZipBase64`, async t => {
@@ -61,7 +61,7 @@ export function makeSanityTests(stackFiltering) {
 
     const bundle = ex1.default();
     const err = bundle.makeError('foo');
-    // console.log(err.stack);
+    t.log(err.stack);
     t.assert(
       stackContains(err.stack, 'encourage.js:2:'),
       'bundled source is in stack trace with correct line number',

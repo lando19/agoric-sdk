@@ -1,0 +1,16 @@
+diff --git a/node_modules/ast-types/lib/types.js b/node_modules/ast-types/lib/types.js
+index ce64cc1..ea6691e 100644
+--- a/node_modules/ast-types/lib/types.js
++++ b/node_modules/ast-types/lib/types.js
+@@ -266,10 +266,7 @@ function typesPlugin(_fork) {
+                 if (bicfIndex >= 0) {
+                     return builtInCtorTypes[bicfIndex];
+                 }
+-                if (typeof name !== "string") {
+-                    throw new Error("missing name");
+-                }
+-                return new PredicateType(name, value);
++                return new PredicateType(name || value.name, value);
+             }
+             // As a last resort, toType returns a type that matches any value that
+             // is === from. This is primarily useful for literal values like

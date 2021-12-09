@@ -138,6 +138,11 @@ export const lockdown = defaultOptions => {
       // this may be a development accident that MUST be fixed before merging.
       //
       // consoleTaming: 'unsafe',
+
+      // Domain taming is safe by default, but any program that imports "domain",
+      // either directly or indirectly, breaks lockdown.
+      // For example, the "esm" package entrains "domain".
+      domainTaming: 'unsafe',
     });
   }
 
