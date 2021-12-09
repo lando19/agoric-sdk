@@ -16,7 +16,7 @@ import {
   makeRatio,
   natSafeMath,
 } from '@agoric/zoe/src/contractSupport/index.js';
-import { AmountMath, AssetKind } from '@agoric/ertp';
+import { AmountMath } from '@agoric/ertp';
 import { Nat } from '@agoric/nat';
 import { makeBridgeManager } from './bridge.js';
 import { makeNameHubKit } from './nameHub.js';
@@ -26,6 +26,11 @@ import {
   fromCosmosIssuerEntries,
   BLD_ISSUER_ENTRY,
 } from './issuers';
+import {
+  feeIssuerConfig,
+  zoeFeesConfig,
+  meteringConfig,
+} from './bootstrap-zoe-config';
 
 const { multiply, floorDivide } = natSafeMath;
 
@@ -78,33 +83,6 @@ export function buildRootObject(vatPowers, vatParameters) {
 
     const chainTimerServiceP = E(vats.timer).createTimerService(timerDevice);
 
-    const feeIssuerConfig = {
-      name: CENTRAL_ISSUER_NAME,
-      assetKind: AssetKind.NAT,
-      displayInfo: { decimalPlaces: 6, assetKind: AssetKind.NAT },
-      initialFunds: 1_000_000_000_000_000_000n,
-    };
-    const zoeFeesConfig = {
-      getPublicFacetFee: 50n,
-      installFee: 65_000n,
-      startInstanceFee: 5_000_000n,
-      offerFee: 65_000n,
-      timeAuthority: chainTimerServiceP,
-      lowFee: 500_000n,
-      highFee: 5_000_000n,
-      shortExp: 1000n * 60n * 5n, // 5 min in milliseconds
-      longExp: 1000n * 60n * 60n * 24n * 1n, // 1 day in milliseconds
-    };
-    const meteringConfig = {
-      incrementBy: 25_000_000n,
-      initial: 50_000_000n,
-      threshold: 25_000_000n,
-      price: {
-        feeNumerator: 1n,
-        computronDenominator: 1n, // default is just one-to-one
-      },
-    };
-
     // Create singleton instances.
     const [
       bankManager,
@@ -122,7 +100,12 @@ export function buildRootObject(vatPowers, vatParameters) {
       /** @type {Promise<{ zoeService: ZoeServiceFeePurseRequired, feeMintAccess:
        * FeeMintAccess, feeCollectionPurse: FeePurse }>} */ (E(
         vats.zoe,
-      ).buildZoe(vatAdminSvc, feeIssuerConfig, zoeFeesConfig, meteringConfig)),
+      ).buildZoe(
+        vatAdminSvc,
+        feeIssuerConfig,
+        zoeFeesConfig(chainTimerServiceP),
+        meteringConfig,
+      )),
       E(vats.priceAuthority).makePriceAuthority(),
       E(vats.walletManager).buildWalletManager(vatAdminSvc),
     ]);

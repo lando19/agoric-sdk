@@ -1,5 +1,10 @@
 // @ts-check
 import { E, Far } from '@agoric/far';
+import {
+  feeIssuerConfig,
+  meteringConfig,
+  zoeFeesConfig,
+} from './bootstrap-zoe-config';
 
 /**
  * @typedef { import('@agoric/eventual-send').EProxy } EProxy
@@ -7,6 +12,10 @@ import { E, Far } from '@agoric/far';
  *   import('@agoric/swingset-vat/src/devices/mailbox-src.js').buildRootDeviceNode> } MailboxDevice
  * @typedef { ReturnType<typeof
  *   import('@agoric/swingset-vat/src/vats/vat-tp.js').buildRootObject> } VattpVat
+ * @typedef { ReturnType<typeof
+ *   import('@agoric/swingset-vat/src/kernel/vatAdmin/vatAdminWrapper.js').buildRootObject> } VatAdminVat
+ * @typedef { ReturnType<typeof
+ *   import('@agoric/swingset-vat/src/vats/vat-timerWrapper.js').buildRootObject> } TimerVat
  */
 
 /**
@@ -33,11 +42,38 @@ export function buildRootObject(vatPowers, _vatParameters) {
     /**
      * Bootstrap vats and devices.
      *
-     * @param {{vattp: VattpVat }} vats
-     * @param {{mailbox: MailboxDevice}} devices
+     * @param {{
+     *   vattp: VattpVat,
+     *   timer: TimerVat,
+     *   vatAdmin: VatAdminVat,
+     *   zoe: ReturnType<import('./vat-zoe').buildRootObject>,
+     * }} vats
+     * @param {{
+     *   mailbox: MailboxDevice,
+     *   vatAdmin: unknown,
+     *   timer: unknown,
+     * }} devices
      */
     bootstrap: async (vats, devices) => {
       await connectVattpWithMailbox(vats.vattp, devices.mailbox);
+
+      const chainTimerServiceP = E(vats.timer).createTimerService(
+        devices.timer,
+      );
+      const vatAdminSvcP = E(vats.vatAdmin).createVatAdminService(
+        devices.vatAdmin,
+      );
+
+      const {
+        zoeService: _zoe,
+        feeMintAccess: _2,
+        feeCollectionPurse: _3,
+      } = await E(vats.zoe).buildZoe(
+        vatAdminSvcP,
+        feeIssuerConfig,
+        zoeFeesConfig(chainTimerServiceP),
+        meteringConfig,
+      );
     },
   });
 }
