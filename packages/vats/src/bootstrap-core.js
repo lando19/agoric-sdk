@@ -20,18 +20,24 @@ import { E, Far } from '@agoric/far';
 export function buildRootObject(vatPowers, _vatParameters) {
   const { D } = vatPowers;
 
+  /**
+   * @param {VattpVat} vattp
+   * @param {MailboxDevice} mailbox
+   */
+  const connectVattpWithMailbox = async (vattp, mailbox) => {
+    D(mailbox).registerInboundHandler(vattp);
+    await E(vattp).registerMailboxDevice(mailbox);
+  };
+
   return Far('bootstrap', {
     /**
      * Bootstrap vats and devices.
-     *
-     * Introduce vattp and mailbox to each other.
      *
      * @param {{vattp: VattpVat }} vats
      * @param {{mailbox: MailboxDevice}} devices
      */
     bootstrap: async (vats, devices) => {
-      D(devices.mailbox).registerInboundHandler(vats.vattp);
-      await E(vats.vattp).registerMailboxDevice(devices.mailbox);
+      await connectVattpWithMailbox(vats.vattp, devices.mailbox);
     },
   });
 }
