@@ -8,14 +8,14 @@ import {
 
 /**
  * @typedef { import('@agoric/eventual-send').EProxy } EProxy
- * @typedef { ReturnType<typeof
- *   import('@agoric/swingset-vat/src/devices/mailbox-src.js').buildRootDeviceNode> } MailboxDevice
- * @typedef { ReturnType<typeof
- *   import('@agoric/swingset-vat/src/vats/vat-tp.js').buildRootObject> } VattpVat
- * @typedef { ReturnType<typeof
- *   import('@agoric/swingset-vat/src/kernel/vatAdmin/vatAdminWrapper.js').buildRootObject> } VatAdminVat
- * @typedef { ReturnType<typeof
- *   import('@agoric/swingset-vat/src/vats/vat-timerWrapper.js').buildRootObject> } TimerVat
+ * @typedef { ERef<ReturnType<typeof
+ *   import('@agoric/swingset-vat/src/devices/mailbox-src.js').buildRootDeviceNode>> } MailboxDevice
+ * @typedef { ERef<ReturnType<typeof
+ *   import('@agoric/swingset-vat/src/vats/vat-tp.js').buildRootObject>> } VattpVat
+ * @typedef { ERef<ReturnType<typeof
+ *   import('@agoric/swingset-vat/src/kernel/vatAdmin/vatAdminWrapper.js').buildRootObject>> } VatAdminVat
+ * @typedef { ERef<ReturnType<typeof
+ *   import('@agoric/swingset-vat/src/vats/vat-timerWrapper.js').buildRootObject>> } TimerVat
  */
 
 /**
