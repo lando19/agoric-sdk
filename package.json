@@ -101,6 +101,6 @@
     "timeout": "30m"
   },
   "dependencies": {
-    "patch-package": "^6.2.2"
+    "patch-package": "^6.4.6"
   }
 }
