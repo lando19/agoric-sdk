@@ -52,7 +52,7 @@
     "node-fetch": "^2.6.0",
     "node-lmdb": "^0.9.5",
     "temp": "^0.9.1",
-    "tmp": "^0.2.1",
+    "tmp": "^0.2.2",
     "ws": "^7.2.0"
   },
   "devDependencies": {
