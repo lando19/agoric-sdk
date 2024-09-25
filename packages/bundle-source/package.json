@@ -30,7 +30,7 @@
     "@rollup/plugin-node-resolve": "^13.0.0",
     "acorn": "^8.2.4",
     "c8": "^7.7.2",
-    "rollup": "^2.47.0",
+    "rollup": "^3.29.5",
     "source-map": "^0.7.3"
   },
   "keywords": [],
