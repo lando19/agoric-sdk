@@ -34,7 +34,7 @@
     "expose-gc": "^1.0.0",
     "n-readlines": "^1.0.1",
     "node-lmdb": "^0.9.5",
-    "yargs": "^16.1.0"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "ava": "^3.12.1",
